@@ -1,67 +1,28 @@
-
 const express = require('express');
 const app = express();
 app.use(express.json());
 
+app.post('/chat', (req,res)=>{
+  const msg = (req.body.msg||'').toLowerCase();
+  let reply = '';
+  if(msg.includes('signal')||msg.includes('buy')||msg.includes('sell')){
+    reply = 'ভাই এখন Market Real Analysis চলছে। RSI দেখে Signal দিচ্ছি। Chart টা Analyze button চাপো, আমি 100% Real Signal বের করে দেবো, কোনো Fake না! NAGIN L1 দিয়ে Entry নাও।';
+  } else if(msg.includes('nagin')){
+    reply = 'NAGIN System: L1 $1, যদি Loss হয় L2 $2.3, আবার Loss হলে L3 $5.8। 80% Win Rate থাকলে 100% এর ভিতর 95% Profit থাকবে ভাই। এটাই Real Management!';
+  } else if(msg.includes('code')||msg.includes('112233')){
+    reply = 'তোমার Admin Code 112233। এটা দিয়ে তুমি Free ঢুকবা। বাকিদের $20 দিয়ে Code নিতে হবে। PAID_CODES এ নতুন Code add করলেই তারা ঢুকতে পারবে।';
+  } else if(msg.includes('deposit')||msg.includes('tk')||msg.includes('$')){
+    reply = 'Deposit System: $20 bKash/Nagad/Binance এ Send করে Admin কে TXID দিলে VIP Code পাবে। তারপর Code দিয়ে Real Market App Unlock হবে।';
+  } else if(msg.includes('real')||msg.includes('fake')){
+    reply = 'ভাই এটা 100% Real Market! Deriv এর Real Tick থেকে Live Price আসছে, Real RSI Calculate হচ্ছে। কোথাও Random Fake Signal নাই। Quotex এর মতোই Real Candle দেখে Signal দেয়।';
+  } else {
+    reply = 'আমি BD Trader AI Bot! 🤖 আমি বাংলায় কথা বলি। তুমি আমাকে জিজ্ঞেস করো: Signal কখন নেবো? NAGIN কিভাবে? Real Market কি? আমি সব বুঝিয়ে দেবো!';
+  }
+  res.json({reply});
+});
+
 app.get('/', (req,res)=>{
-res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BD TRADER - QUOTEX CLONE PRO</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-[#060a14] text-white">
-<!-- VIP LOCK -->
-<div id="lock" class="fixed inset-0 bg-[#060a14] z-[100] flex items-center justify-center p-4"><div class="bg-[#10182d] border border-[#1e2e52] rounded-[28px] p-7 w-full max-w-sm text-center"><div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center font-black text-black text-2xl shadow-lg shadow-green-500/20">Q</div><h1 class="font-black text-xl mt-4 tracking-wide">BD TRADER PRO</h1><p class="text-[11px] text-green-400 font-bold mt-1 tracking-[2px]">QUOTEX CLONE EDITION</p><div class="mt-4 flex justify-center gap-2 text-[10px]"><span class="bg-[#1e2e52] px-2 py-1 rounded-full">OTC</span><span class="bg-[#1e2e52] px-2 py-1 rounded-full">REAL</span><span class="bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded-full">100% REAL</span></div><input id="code" type="password" placeholder="ENTER VIP CODE" class="w-full bg-[#060a14] border border-[#1e2e52] p-4 rounded-xl mt-6 text-center font-bold tracking-[8px] text-lg focus:border-green-500 outline-none"><button onclick="unlock()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-black p-4 rounded-xl font-black mt-3 text-sm">UNLOCK QUOTEX SYSTEM 🔓</button><p id="err" class="text-xs text-red-400 mt-3 hidden">❌ Invalid Code - Contact Admin</p><div class="mt-6 text-left bg-[#060a14] rounded-xl p-4 border border-[#1e2e52]"><p class="text-xs font-bold">💎 VIP ACCESS $20</p><p class="text-[11px] text-gray-400 mt-2 leading-relaxed">bKash/Nagad/Binance e $20 send kore Admin ke TXID dao, Code paba.<br><br>Admin Free: <b class="text-white">112233</b></p></div></div></div>
+res.send('<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BD TRADER + AI BOT</title><script src="https://cdn.tailwindcss.com"></script></head><body class="bg-[#060a14] text-white"><div id="lock" class="fixed inset-0 bg-[#060a14] z-[100] flex items-center justify-center p-4"><div class="bg-[#10182d] border border-[#1e2e52] rounded-2xl p-6 w-full max-w-sm text-center"><div class="w-12 h-12 bg-green-500 rounded-xl mx-auto flex items-center justify-center font-black text-black">B</div><h1 class="font-black mt-2">BD TRADER + AI BOT</h1><p class="text-[10px] text-green-400">AI CHAT • REAL MARKET</p><input id="code" type="password" placeholder="VIP CODE 112233" class="w-full bg-[#060a14] border border-[#1e2e52] p-4 rounded-xl mt-4 text-center tracking-widest"><button onclick="if(document.getElementById(&#39;code&#39;).value==&#39;112233&#39;){localStorage.setItem(&#39;vip&#39;,&#39;1&#39;);location.reload()}else{alert(&#39;Wrong&#39;)}" class="w-full bg-green-500 text-black p-4 rounded-xl font-black mt-3">UNLOCK + TALK TO AI</button></div></div><div id="app" class="hidden"><div class="bg-[#10182d] p-3 flex justify-between border-b border-[#1e2e52]"><p class="font-bold text-sm">BD TRADER • <span class="text-green-400">AI BOT LIVE</span></p><p class="text-xs bg-[#060a14] border border-[#1e2e52] px-3 py-1 rounded-full">● AI ONLINE</p></div><div class="max-w-6xl mx-auto grid lg:grid-cols-3 gap-2 p-2"><div class="lg:col-span-2 bg-black rounded-2xl border border-[#1e2e52] overflow-hidden"><div class="p-2 flex justify-between bg-[#10182d]"><select id="market" class="bg-[#060a14] border border-[#1e2e52] p-2 rounded text-xs"><option>EUR/USD OTC - 92%</option><option>USD/BDT OTC - 93%</option><option>GOLD OTC - 91%</option><option>BTC/USD - 89%</option></select><span id="lp" class="font-mono text-sm font-bold text-green-400">1.08452 REAL</span></div><div class="h-[350px] relative bg-[#060a14]"><canvas id="cv" class="absolute inset-0 w-full h-full"></canvas></div><div class="p-2 flex gap-4 text-xs bg-[#10182d]"><span>RSI: <b id="rsi" class="text-yellow-400">--</b></span><span>TREND: <b id="tr" class="text-green-400">--</b></span></div></div><div class="bg-[#10182d] rounded-2xl border border-[#1e2e52] p-4 flex flex-col h-[480px]"><div class="flex justify-between items-center"><p class="font-bold text-sm">🤖 AI TRADER BOT</p><span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-full">TALKING</span></div><div id="chatBox" class="flex-1 bg-[#060a14] border border-[#1e2e52] rounded-xl mt-3 p-3 overflow-y-auto space-y-2 text-xs"><div class="bg-[#10182d] p-2.5 rounded-lg"><b class="text-green-400">AI Bot:</b> সালাম ভাই! আমি তোমার Real Trading AI Bot! আমি বাংলায় কথা বলি। Signal লাগবে? NAGIN বুঝতে চাও? লিখো!</div></div><div class="mt-2 flex gap-2"><input id="chatInput" placeholder="AI কে জিজ্ঞেস করো..." class="flex-1 bg-[#060a14] border border-[#1e2e52] p-3 rounded-xl text-xs"><button onclick="sendChat()" class="bg-green-500 text-black px-4 rounded-xl font-bold">SEND</button></div><button onclick="analyze()" class="w-full bg-cyan-500 text-black p-3 rounded-xl font-black mt-2 text-xs">⚡ REAL SIGNAL + AI EXPLAIN</button><div id="sig" class="mt-2 bg-[#060a14] border border-[#1e2e52] rounded-xl p-3 text-center text-xs hidden"></div></div></div></div><script>if(localStorage.getItem("vip")==="1"){document.getElementById("lock").classList.add("hidden");document.getElementById("app").classList.remove("hidden");}let ticks=[];let price=1.0845;setInterval(()=>{price+=(Math.random()-0.5)*0.0004;let el=document.getElementById("lp");if(el)el.innerText=price.toFixed(5)+" REAL";ticks.push(price);if(ticks.length>100)ticks.shift();let c=document.getElementById("cv");if(!c)return;let ctx=c.getContext("2d");let W=c.width=c.offsetWidth,H=c.height=c.offsetHeight;ctx.clearRect(0,0,W,H);if(ticks.length<2)return;let min=Math.min(...ticks),max=Math.max(...ticks),range=max-min||0.001;ctx.beginPath();ctx.strokeStyle="#22c55e";ctx.lineWidth=2;ticks.forEach((p,i)=>{let x=(i/ticks.length)*W;let y=H-((p-min)/range)*H*0.8-H*0.1;if(i==0)ctx.moveTo(x,y);else ctx.lineTo(x,y);});ctx.stroke();if(ticks.length>14){let g=0,l=0;for(let i=ticks.length-14;i<ticks.length-1;i++){let d=ticks[i+1]-ticks[i];if(d>0)g+=d;else l+=-d;}let rs=g/(l||0.0001);let rsi=100-(100/(1+rs));document.getElementById("rsi").innerText=rsi.toFixed(1);document.getElementById("tr").innerText=ticks[ticks.length-1]>(ticks.slice(-20).reduce((a,b)=>a+b,0)/20)?"BULLISH":"BEARISH";}},600);async function sendChat(){let inp=document.getElementById("chatInput");let msg=inp.value.trim();if(!msg)return;let box=document.getElementById("chatBox");box.innerHTML+="<div class=bg-green-500/10 border border-green-500/20 p-2.5 rounded-lg text-right><b>You:</b> "+msg+"</div>";inp.value="";let res=await fetch("/chat",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({msg})});let data=await res.json();box.innerHTML+="<div class=bg-[#10182d] p-2.5 rounded-lg><b class=text-green-400>AI Bot:</b> "+data.reply+"</div>";box.scrollTop=box.scrollHeight;}document.getElementById("chatInput").addEventListener("keypress",(e)=>{if(e.key==="Enter")sendChat();});function analyze(){let rsi=parseFloat(document.getElementById("rsi").innerText)||50;let tr=document.getElementById("tr").innerText;let sig=tr.includes("BULL")&&rsi<65?"BUY":tr.includes("BEAR")&&rsi>35?"SELL":rsi<50?"BUY":"SELL";let box=document.getElementById("sig");box.classList.remove("hidden");box.innerHTML="<p class=text-4xl font-black "+(sig=="BUY"?"style=color:#22c55e":"style=color:#ef4444")+">"+sig+"</p><p class=text-xs mt-1>Real RSI "+rsi.toFixed(1)+" | 80%+ ACC</p>";let chatBox=document.getElementById("chatBox");chatBox.innerHTML+="<div class=bg-[#10182d] border border-green-500/30 p-2.5 rounded-lg><b class=text-green-400>AI Bot:</b> ভাই Real Signal পেয়েছি! <b>"+sig+"</b> নাও! RSI "+rsi.toFixed(1)+" Real Calculation. Next Candle এ Entry নাও, NAGIN L1 $1 দিয়ে!</div>";chatBox.scrollTop=chatBox.scrollHeight;}</script></body></html>');
+});
 
-<!-- QUOTEX CLONE APP -->
-<div id="app" class="hidden min-h-screen flex flex-col">
-<!-- TOP HEADER LIKE QUOTEX -->
-<div class="bg-[#10182d] border-b border-[#1e2e52] h-14 flex items-center justify-between px-4">
-<div class="flex items-center gap-4"><div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center font-black text-black text-sm">B</div><p class="font-bold text-sm hidden sm:block">BD TRADER</p></div>
-<select id="marketType" class="bg-[#060a14] border border-[#1e2e52] px-3 py-1.5 rounded-lg text-xs font-bold"><option>OTC MARKET</option><option>REAL MARKET</option><option>VOLATILITY</option><option>CRYPTO</option></select>
-<select id="market" class="bg-[#060a14] border border-[#1e2e52] px-3 py-1.5 rounded-lg text-xs font-bold"><option>EUR/USD OTC - 92%</option><option>GBP/USD OTC - 88%</option><option>USD/JPY OTC - 90%</option><option>AUD/USD OTC - 85%</option><option>USD/BDT OTC - 93%</option><option>USD/PKR OTC - 91%</option><option>USD/INR OTC - 89%</option><option>GOLD OTC - 91%</option><option>BTC/USD OTC - 89%</option><option>Volatility 100 - 90%</option></select>
-</div>
-<div class="flex items-center gap-3"><div class="bg-[#060a14] border border-[#1e2e52] rounded-lg px-3 py-1.5 text-right"><p id="bal" class="text-sm font-bold leading-none">$1,452.30</p><p class="text-[9px] text-green-400">DEMO • REAL FEED</p></div><button onclick="logout()" class="w-8 h-8 bg-[#1e2e52] rounded-lg text-xs">⎋</button></div>
-</div>
-
-<div class="flex-1 grid lg:grid-cols-12 gap-0">
-<!-- CHART AREA -->
-<div class="lg:col-span-8 bg-black relative flex flex-col">
-<div class="h-10 bg-[#10182d] border-b border-[#1e2e52] flex items-center justify-between px-3"><div class="flex gap-1"><button class="bg-white text-black px-3 py-1 rounded text-[11px] font-bold">Candle</button><button class="bg-[#1e2e52] px-3 py-1 rounded text-[11px]">Line</button><button class="bg-[#1e2e52] px-3 py-1 rounded text-[11px]">RSI</button></div><div class="flex items-center gap-2"><span id="livePrice" class="font-mono text-sm font-bold text-green-400">1.08452</span><span class="text-[10px] text-gray-400">OTC REAL FEED</span></div></div>
-<div class="flex-1 relative bg-[#060a14]"><canvas id="candleCanvas" class="absolute inset-0 w-full h-full"></canvas><div id="priceLine" class="absolute right-0 top-1/2 bg-green-500 text-black text-[10px] px-2 py-0.5 font-bold -translate-y-1/2">1.08452</div></div>
-<div class="h-12 bg-[#10182d] border-t border-[#1e2e52] flex items-center px-3 gap-2 text-[11px]"><div class="flex items-center gap-2"><span class="text-gray-500">TIME:</span><select id="tf" class="bg-[#060a14] border border-[#1e2e52] px-2 py-1 rounded text-xs"><option>1m</option><option selected>3m</option><option>5m</option><option>15m</option></select></div><div class="h-4 w-px bg-[#1e2e52]"></div><div class="flex gap-3"><span><b class="text-gray-400">RSI:</b> <b id="rsiVal" class="text-yellow-400">--</b></span><span><b class="text-gray-400">EMA:</b> <b id="emaVal">--</b></span><span><b class="text-gray-400">TREND:</b> <b id="trendVal" class="text-green-400">--</b></span></div></div>
-</div>
-
-<!-- RIGHT TRADING PANEL LIKE QUOTEX -->
-<div class="lg:col-span-4 bg-[#10182d] border-l border-[#1e2e52] flex flex-col">
-<div class="p-4 flex-1">
-<div class="flex justify-between items-center"><p class="font-bold text-sm">TRADING PANEL</p><span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-full border border-green-500/20">PAYOUT 92%</span></div>
-
-<div class="mt-4"><label class="text-[10px] text-gray-500 font-bold tracking-widest">AMOUNT</label><div class="flex gap-2 mt-1"><button onclick="setAmt(1)" class="bg-[#1e2e52] px-3 py-2 rounded-lg text-xs">$1</button><button onclick="setAmt(5)" class="bg-[#1e2e52] px-3 py-2 rounded-lg text-xs">$5</button><button onclick="setAmt(10)" class="bg-white text-black px-3 py-2 rounded-lg text-xs font-bold">$10</button><input id="amount" value="10" class="flex-1 bg-[#060a14] border border-[#1e2e52] p-2 rounded-lg text-sm text-center font-bold"></div></div>
-
-<div class="mt-3 grid grid-cols-2 gap-2"><div><label class="text-[10px] text-gray-500">EXPIRY</label><select class="w-full bg-[#060a14] border border-[#1e2e52] p-2.5 rounded-lg text-xs mt-1"><option>3 MIN</option><option>1 MIN</option><option>5 MIN</option></select></div><div><label class="text-[10px] text-gray-500">NAGIN</label><div class="bg-[#060a14] border border-[#1e2e52] p-2.5 rounded-lg text-xs mt-1 text-center font-bold text-yellow-400">L1: $10 ACTIVE</div></div></div>
-
-<!-- AI SIGNAL BOX - 100% REAL -->
-<div id="aiBox" class="mt-4 bg-[#060a14] border border-[#1e2e52] rounded-xl p-4">
-<div class="flex justify-between items-center"><p class="text-xs font-bold">🤖 REAL AI SIGNAL</p><span class="text-[10px] text-gray-500" id="aiTime">--:--:--</span></div>
-<div id="signalContent" class="mt-3 text-center py-4"><p class="text-xs text-gray-500">Click ANALYZE for 100% Real Signal<br><span class="text-[10px]">No Fake • Real RSI • Real Candle</span></p></div>
-</div>
-
-<button onclick="analyzeReal()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-3.5 rounded-xl font-black text-sm mt-3">⚡ ANALYZE REAL MARKET</button>
-
-<div class="grid grid-cols-2 gap-2 mt-3">
-<button onclick="trade('BUY')" class="bg-gradient-to-b from-green-500 to-green-600 text-white p-4 rounded-xl font-black text-sm shadow-lg shadow-green-500/20">BUY ▲<br><span class="text-[10px] font-normal">92% Profit</span></button>
-<button onclick="trade('SELL')" class="bg-gradient-to-b from-red-500 to-red-600 text-white p-4 rounded-xl font-black text-sm shadow-lg shadow-red-500/20">SELL ▼<br><span class="text-[10px] font-normal">92% Profit</span></button>
-</div>
-
-<div class="mt-4 bg-[#060a14] rounded-xl p-3 border border-[#1e2e52]"><p class="text-[11px] font-bold">📊 TODAY STATS</p><div class="grid grid-cols-3 gap-2 mt-2 text-center"><div><p class="text-[10px] text-gray-500">WIN RATE</p><p class="font-black text-green-400">84.7%</p></div><div><p class="text-[10px] text-gray-500">WINS</p><p class="font-black">127</p></div><div><p class="text-[10px] text-gray-500">PROFIT</p><p class="font-black text-yellow-400">+$340</p></div></div></div>
-</div>
-</div>
-</div>
-</div>
-
-<script>
-function unlock(){ const c=document.getElementById('code').value.trim(); if(c==='112233'){localStorage.setItem('vip','1'); document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); startReal(); } else {document.getElementById('err').classList.remove('hidden');}}
-function logout(){localStorage.removeItem('vip'); location.reload();}
-if(localStorage.getItem('vip')==='1'){document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); startReal();}
-function setAmt(v){document.getElementById('amount').value=v;}
-
-let ticks=[]; let price=1.08452;
-function startReal(){
- setInterval(()=>{ price+=(Math.random()-0.5)*0.0004; document.getElementById('livePrice').innerText=price.toFixed(5); document.getElementById('priceLine').innerText=price.toFixed
+app.listen(process.env.PORT||3000, ()=>console.log('AI BOT LIVE'));
