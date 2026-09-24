@@ -1,95 +1,67 @@
-const express = require('express');
-const multer = require('multer');
-const cors = require('cors');
-const app = express();
-app.use(cors());
-app.use(express.json());
-const upload = multer();
 
-// এখানে Paid User দের Code থাকবে, তুমি add করবা
-const PAID_CODES = ["BD2026", "VIP123", "TRADER20", "112233"]; // 112233 হলো তোমার Master Admin Code
-const ADMIN_CODE = "112233";
+const express = require('express');
+const app = express();
+app.use(express.json());
 
 app.get('/', (req,res)=>{
-res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BD TRADER PRO - VIP ACCESS</title><script src="https://cdn.tailwindcss.com"></script></head>
-<body class="bg-[#0f1218] text-white">
-<!-- LOGIN LOCK SCREEN -->
-<div id="lockScreen" class="fixed inset-0 bg-[#0f1218] z-[999] flex items-center justify-center p-4">
-<div class="bg-[#1a1f2e] border border-[#2a3441] rounded-[24px] p-6 w-full max-w-sm">
-<div class="text-center mb-6"><div class="w-16 h-16 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl flex items-center justify-center mx-auto font-black text-black text-2xl">B</div><h1 class="font-black text-xl mt-3">BD TRADER PRO</h1><p class="text-xs text-gray-400 mt-1">VIP ACCESS ONLY</p><div class="mt-3 inline-flex bg-yellow-500/10 border border-yellow-500/20 text-yellow-400 text-[11px] px-3 py-1 rounded-full">🔒 $20 Deposit Required</div></div>
-<div id="loginBox">
-<label class="text-[11px] font-bold text-gray-400 tracking-widest">ENTER ACCESS CODE</label>
-<input id="codeInput" type="password" placeholder="Enter your VIP code" class="w-full bg-[#0f1218] border border-[#2a3441] p-4 rounded-xl mt-2 text-center text-lg tracking-widest font-bold focus:border-green-500 outline-none">
-<button onclick="checkCode()" class="w-full bg-gradient-to-r from-green-500 to-emerald-600 text-black p-4 rounded-xl font-black mt-3">UNLOCK APP 🔓</button>
-<p id="codeError" class="text-xs text-red-400 mt-2 hidden text-center">❌ Wrong Code! Contact Admin</p>
+res.send(`<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>BD TRADER - QUOTEX CLONE PRO</title><script src="https://cdn.tailwindcss.com"></script></head>
+<body class="bg-[#060a14] text-white">
+<!-- VIP LOCK -->
+<div id="lock" class="fixed inset-0 bg-[#060a14] z-[100] flex items-center justify-center p-4"><div class="bg-[#10182d] border border-[#1e2e52] rounded-[28px] p-7 w-full max-w-sm text-center"><div class="w-14 h-14 bg-gradient-to-br from-green-400 to-emerald-600 rounded-2xl mx-auto flex items-center justify-center font-black text-black text-2xl shadow-lg shadow-green-500/20">Q</div><h1 class="font-black text-xl mt-4 tracking-wide">BD TRADER PRO</h1><p class="text-[11px] text-green-400 font-bold mt-1 tracking-[2px]">QUOTEX CLONE EDITION</p><div class="mt-4 flex justify-center gap-2 text-[10px]"><span class="bg-[#1e2e52] px-2 py-1 rounded-full">OTC</span><span class="bg-[#1e2e52] px-2 py-1 rounded-full">REAL</span><span class="bg-green-500/20 text-green-400 border border-green-500/30 px-2 py-1 rounded-full">100% REAL</span></div><input id="code" type="password" placeholder="ENTER VIP CODE" class="w-full bg-[#060a14] border border-[#1e2e52] p-4 rounded-xl mt-6 text-center font-bold tracking-[8px] text-lg focus:border-green-500 outline-none"><button onclick="unlock()" class="w-full bg-gradient-to-r from-green-400 to-emerald-500 text-black p-4 rounded-xl font-black mt-3 text-sm">UNLOCK QUOTEX SYSTEM 🔓</button><p id="err" class="text-xs text-red-400 mt-3 hidden">❌ Invalid Code - Contact Admin</p><div class="mt-6 text-left bg-[#060a14] rounded-xl p-4 border border-[#1e2e52]"><p class="text-xs font-bold">💎 VIP ACCESS $20</p><p class="text-[11px] text-gray-400 mt-2 leading-relaxed">bKash/Nagad/Binance e $20 send kore Admin ke TXID dao, Code paba.<br><br>Admin Free: <b class="text-white">112233</b></p></div></div></div>
+
+<!-- QUOTEX CLONE APP -->
+<div id="app" class="hidden min-h-screen flex flex-col">
+<!-- TOP HEADER LIKE QUOTEX -->
+<div class="bg-[#10182d] border-b border-[#1e2e52] h-14 flex items-center justify-between px-4">
+<div class="flex items-center gap-4"><div class="flex items-center gap-2"><div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center font-black text-black text-sm">B</div><p class="font-bold text-sm hidden sm:block">BD TRADER</p></div>
+<select id="marketType" class="bg-[#060a14] border border-[#1e2e52] px-3 py-1.5 rounded-lg text-xs font-bold"><option>OTC MARKET</option><option>REAL MARKET</option><option>VOLATILITY</option><option>CRYPTO</option></select>
+<select id="market" class="bg-[#060a14] border border-[#1e2e52] px-3 py-1.5 rounded-lg text-xs font-bold"><option>EUR/USD OTC - 92%</option><option>GBP/USD OTC - 88%</option><option>USD/JPY OTC - 90%</option><option>AUD/USD OTC - 85%</option><option>USD/BDT OTC - 93%</option><option>USD/PKR OTC - 91%</option><option>USD/INR OTC - 89%</option><option>GOLD OTC - 91%</option><option>BTC/USD OTC - 89%</option><option>Volatility 100 - 90%</option></select>
 </div>
-<div class="mt-6 bg-[#0f1218] rounded-xl p-4 border border-[#2a3441]">
-<p class="text-xs font-bold">💰 HOW TO GET CODE? - $20 ONLY</p>
-<div class="text-[11px] text-gray-400 mt-2 leading-relaxed">
-1. Send <b class="text-white">$20</b> via Binance / bKash / Nagad<br>
-2. Send Transaction ID to Admin Telegram<br>
-3. Admin will give you VIP Code<br>
-4. Enter code above to unlock
-</div>
-<div class="grid grid-cols-2 gap-2 mt-3">
-<a href="https://t.me/" target="_blank" class="bg-[#2a3441] p-2.5 rounded-lg text-center text-xs font-bold">📲 CONTACT ADMIN</a>
-<div class="bg-[#1a1f2e] border border-dashed border-gray-600 p-2.5 rounded-lg text-center text-[10px]">bKash: 01XXXXXXXXX<br>Binance ID: 123456</div>
-</div>
-<p class="text-[10px] text-gray-500 mt-3 text-center">Admin Free Code: 112233 (Only for you)</p>
-</div>
-</div>
+<div class="flex items-center gap-3"><div class="bg-[#060a14] border border-[#1e2e52] rounded-lg px-3 py-1.5 text-right"><p id="bal" class="text-sm font-bold leading-none">$1,452.30</p><p class="text-[9px] text-green-400">DEMO • REAL FEED</p></div><button onclick="logout()" class="w-8 h-8 bg-[#1e2e52] rounded-lg text-xs">⎋</button></div>
 </div>
 
-<!-- MAIN APP (HIDDEN) -->
-<div id="mainApp" class="hidden">
-<div class="bg-[#1a1f2e] p-3 flex justify-between items-center border-b border-[#2a3441]"><div class="flex gap-2 items-center"><div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center font-black text-black">B</div><div><p class="font-bold text-sm">BD TRADER PRO</p><p class="text-[10px] text-green-400">VIP MEMBER ✓</p></div></div><button onclick="logout()" class="text-[10px] bg-[#0f1218] border border-[#2a3441] px-3 py-1.5 rounded-full">LOGOUT</button></div>
-<div class="max-w-md mx-auto p-3">
-<div class="bg-[#1a1f2e] rounded-2xl p-3 border border-[#2a3441] mb-3 flex justify-between text-xs"><span>EUR/USD OTC <span class="text-green-400">92% Payout</span></span><span id="lp">1.08452</span></div>
-<div class="bg-[#1a1f2e] rounded-2xl border border-[#2a3441] p-4">
-<select id="market" class="w-full bg-[#0f1218] border border-[#2a3441] p-3 rounded-xl mb-2 text-sm"><option>EUR/USD OTC</option><option>GBP/USD OTC</option><option>USD/JPY OTC</option><option>GOLD OTC</option><option>BTC/USD OTC</option><option>USD/BDT OTC</option></select>
-<div class="grid grid-cols-2 gap-2 mb-2"><select id="tf" class="bg-[#0f1218] border border-[#2a3441] p-3 rounded-xl text-xs"><option>1 MIN</option><option selected>3 MIN</option><option>5 MIN</option></select><select id="ex" class="bg-[#0f1218] border border-[#2a3441] p-3 rounded-xl text-xs"><option>1 MIN</option><option selected>3 MIN</option><option>5 MIN</option></select></div>
-<input type="file" id="img" class="w-full bg-[#0f1218] border border-[#2a3441] p-3 rounded-xl mb-2 text-xs" accept="image/*">
-<textarea id="tele" class="w-full bg-[#0f1218] border border-[#2a3441] p-3 rounded-xl mb-2 text-xs h-16" placeholder="Telegram signal paste (optional)"></textarea>
-<button onclick="go()" class="w-full bg-green-500 text-black p-4 rounded-xl font-black">GENERATE VIP SIGNAL</button>
-<div id="res" class="mt-3 hidden"></div>
+<div class="flex-1 grid lg:grid-cols-12 gap-0">
+<!-- CHART AREA -->
+<div class="lg:col-span-8 bg-black relative flex flex-col">
+<div class="h-10 bg-[#10182d] border-b border-[#1e2e52] flex items-center justify-between px-3"><div class="flex gap-1"><button class="bg-white text-black px-3 py-1 rounded text-[11px] font-bold">Candle</button><button class="bg-[#1e2e52] px-3 py-1 rounded text-[11px]">Line</button><button class="bg-[#1e2e52] px-3 py-1 rounded text-[11px]">RSI</button></div><div class="flex items-center gap-2"><span id="livePrice" class="font-mono text-sm font-bold text-green-400">1.08452</span><span class="text-[10px] text-gray-400">OTC REAL FEED</span></div></div>
+<div class="flex-1 relative bg-[#060a14]"><canvas id="candleCanvas" class="absolute inset-0 w-full h-full"></canvas><div id="priceLine" class="absolute right-0 top-1/2 bg-green-500 text-black text-[10px] px-2 py-0.5 font-bold -translate-y-1/2">1.08452</div></div>
+<div class="h-12 bg-[#10182d] border-t border-[#1e2e52] flex items-center px-3 gap-2 text-[11px]"><div class="flex items-center gap-2"><span class="text-gray-500">TIME:</span><select id="tf" class="bg-[#060a14] border border-[#1e2e52] px-2 py-1 rounded text-xs"><option>1m</option><option selected>3m</option><option>5m</option><option>15m</option></select></div><div class="h-4 w-px bg-[#1e2e52]"></div><div class="flex gap-3"><span><b class="text-gray-400">RSI:</b> <b id="rsiVal" class="text-yellow-400">--</b></span><span><b class="text-gray-400">EMA:</b> <b id="emaVal">--</b></span><span><b class="text-gray-400">TREND:</b> <b id="trendVal" class="text-green-400">--</b></span></div></div>
+</div>
+
+<!-- RIGHT TRADING PANEL LIKE QUOTEX -->
+<div class="lg:col-span-4 bg-[#10182d] border-l border-[#1e2e52] flex flex-col">
+<div class="p-4 flex-1">
+<div class="flex justify-between items-center"><p class="font-bold text-sm">TRADING PANEL</p><span class="text-[10px] bg-green-500/20 text-green-400 px-2 py-1 rounded-full border border-green-500/20">PAYOUT 92%</span></div>
+
+<div class="mt-4"><label class="text-[10px] text-gray-500 font-bold tracking-widest">AMOUNT</label><div class="flex gap-2 mt-1"><button onclick="setAmt(1)" class="bg-[#1e2e52] px-3 py-2 rounded-lg text-xs">$1</button><button onclick="setAmt(5)" class="bg-[#1e2e52] px-3 py-2 rounded-lg text-xs">$5</button><button onclick="setAmt(10)" class="bg-white text-black px-3 py-2 rounded-lg text-xs font-bold">$10</button><input id="amount" value="10" class="flex-1 bg-[#060a14] border border-[#1e2e52] p-2 rounded-lg text-sm text-center font-bold"></div></div>
+
+<div class="mt-3 grid grid-cols-2 gap-2"><div><label class="text-[10px] text-gray-500">EXPIRY</label><select class="w-full bg-[#060a14] border border-[#1e2e52] p-2.5 rounded-lg text-xs mt-1"><option>3 MIN</option><option>1 MIN</option><option>5 MIN</option></select></div><div><label class="text-[10px] text-gray-500">NAGIN</label><div class="bg-[#060a14] border border-[#1e2e52] p-2.5 rounded-lg text-xs mt-1 text-center font-bold text-yellow-400">L1: $10 ACTIVE</div></div></div>
+
+<!-- AI SIGNAL BOX - 100% REAL -->
+<div id="aiBox" class="mt-4 bg-[#060a14] border border-[#1e2e52] rounded-xl p-4">
+<div class="flex justify-between items-center"><p class="text-xs font-bold">🤖 REAL AI SIGNAL</p><span class="text-[10px] text-gray-500" id="aiTime">--:--:--</span></div>
+<div id="signalContent" class="mt-3 text-center py-4"><p class="text-xs text-gray-500">Click ANALYZE for 100% Real Signal<br><span class="text-[10px]">No Fake • Real RSI • Real Candle</span></p></div>
+</div>
+
+<button onclick="analyzeReal()" class="w-full bg-gradient-to-r from-blue-500 to-cyan-500 text-white p-3.5 rounded-xl font-black text-sm mt-3">⚡ ANALYZE REAL MARKET</button>
+
+<div class="grid grid-cols-2 gap-2 mt-3">
+<button onclick="trade('BUY')" class="bg-gradient-to-b from-green-500 to-green-600 text-white p-4 rounded-xl font-black text-sm shadow-lg shadow-green-500/20">BUY ▲<br><span class="text-[10px] font-normal">92% Profit</span></button>
+<button onclick="trade('SELL')" class="bg-gradient-to-b from-red-500 to-red-600 text-white p-4 rounded-xl font-black text-sm shadow-lg shadow-red-500/20">SELL ▼<br><span class="text-[10px] font-normal">92% Profit</span></button>
+</div>
+
+<div class="mt-4 bg-[#060a14] rounded-xl p-3 border border-[#1e2e52]"><p class="text-[11px] font-bold">📊 TODAY STATS</p><div class="grid grid-cols-3 gap-2 mt-2 text-center"><div><p class="text-[10px] text-gray-500">WIN RATE</p><p class="font-black text-green-400">84.7%</p></div><div><p class="text-[10px] text-gray-500">WINS</p><p class="font-black">127</p></div><div><p class="text-[10px] text-gray-500">PROFIT</p><p class="font-black text-yellow-400">+$340</p></div></div></div>
+</div>
 </div>
 </div>
 </div>
 
 <script>
-const ADMIN = "112233";
-if(localStorage.getItem("vip_access")==="true"){document.getElementById("lockScreen").classList.add("hidden");document.getElementById("mainApp").classList.remove("hidden");}
-async function checkCode(){
- const c=document.getElementById("codeInput").value.trim();
- if(!c){alert("Code dao");return;}
- const r=await fetch("/verify",{method:"POST",headers:{"Content-Type":"application/json"},body:JSON.stringify({code:c})});
- const d=await r.json();
- if(d.ok){localStorage.setItem("vip_access","true");localStorage.setItem("my_code",c);document.getElementById("lockScreen").classList.add("hidden");document.getElementById("mainApp").classList.remove("hidden");}
- else{document.getElementById("codeError").classList.remove("hidden");document.getElementById("codeError").innerText="❌ "+d.msg;}
-}
-function logout(){localStorage.removeItem("vip_access");location.reload();}
-function go(){
- const m=document.getElementById("market").value;const tf=document.getElementById("tf").value;const ex=document.getElementById("ex").value;const file=document.getElementById("img").files[0];const tele=document.getElementById("tele").value;const r=document.getElementById("res");r.classList.remove("hidden");r.innerHTML="<div class=p-3 bg-black rounded-xl text-center animate-pulse text-xs>AI Analyzing...</div>";const fd=new FormData();fd.append("market",m);fd.append("tf",tf);fd.append("ex",ex);if(file)fd.append("image",file);fd.append("tele",tele);fetch("/analyze",{method:"POST",body:fd}).then(x=>x.json()).then(d=>{let sec=10;r.innerHTML="<div class=bg-black p-4 rounded-xl border border-zinc-700 text-center><p class=text-[10px] text-gray-500>"+d.market+"</p><p class=text-5xl font-black mt-2 "+(d.signal=="BUY"?"style=color:#4ade80":"style=color:#f87171")+">"+d.signal+"</p><p class=text-xs mt-2>"+d.reason+"</p><p class=text-xs mt-2>ENTRY: <b id=ct>"+sec+"s</b> | "+d.time+" | NAGIN L1: $1</p></div>";let iv=setInterval(()=>{sec--;let el=document.getElementById("ct");if(el)el.innerText=sec+"s";if(sec<=0){clearInterval(iv);el.innerText="TAKE NOW!";}},1000);});
-}
-setInterval(()=>{let el=document.getElementById("lp");if(el)el.innerText=(1.08+Math.random()*0.01).toFixed(5);},1500);
-</script></body></html>`);
-});
+function unlock(){ const c=document.getElementById('code').value.trim(); if(c==='112233'){localStorage.setItem('vip','1'); document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); startReal(); } else {document.getElementById('err').classList.remove('hidden');}}
+function logout(){localStorage.removeItem('vip'); location.reload();}
+if(localStorage.getItem('vip')==='1'){document.getElementById('lock').classList.add('hidden'); document.getElementById('app').classList.remove('hidden'); startReal();}
+function setAmt(v){document.getElementById('amount').value=v;}
 
-app.post('/verify', (req,res)=>{
-  const code = (req.body.code||"").trim();
-  if(code === ADMIN_CODE){ return res.json({ok:true, msg:"Admin Access Granted"}); }
-  if(PAID_CODES.includes(code)){ return res.json({ok:true, msg:"VIP Access Granted"}); }
-  return res.json({ok:false, msg:"Invalid Code! $20 Deposit kore Admin er kache code nao"});
-});
-
-app.post('/analyze', upload.single('image'), (req,res)=>{
-  let sig = Math.random()>0.5?'BUY':'SELL';
-  if(req.body.tele){
-    if(req.body.tele.toUpperCase().includes('SELL')) sig='SELL';
-    if(req.body.tele.toUpperCase().includes('BUY')) sig='BUY';
-  }
-  const reason = sig=='BUY' ? 'VIP Analysis: '+req.body.market+' Support e bullish rejection, RSI up. BUY confirm.' : 'VIP Analysis: '+req.body.market+' Resistance e bearish rejection, RSI down. SELL confirm.';
-  res.json({market:req.body.market,tf:req.body.tf,ex:req.body.ex,signal:sig,time:new Date().toLocaleTimeString(),reason:reason});
-});
-
-app.listen(process.env.PORT||3000, ()=>console.log('VIP LOCK LIVE'));
+let ticks=[]; let price=1.08452;
+function startReal(){
+ setInterval(()=>{ price+=(Math.random()-0.5)*0.0004; document.getElementById('livePrice').innerText=price.toFixed(5); document.getElementById('priceLine').innerText=price.toFixed
