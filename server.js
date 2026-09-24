@@ -1,24 +1,23 @@
+const express = require("express");
 const cors = require("cors");
 const multer = require("multer");
 const dotenv = require("dotenv");
-const OpenAI = require("openai");
+const { GoogleGenerativeAI } = require("@google/generative-ai");
 
 dotenv.config();
 const app = express();
 app.use(cors());
 app.use(express.json());
 
-const upload = multer({ 
+const upload = multer({
   storage: multer.memoryStorage(),
   limits: { fileSize: 8 * 1024 * 1024 }
 });
 
-const client = new OpenAI({ 
-  apiKey: process.env.OPENAI_API_KEY 
-});
+const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
 app.get("/", (req, res) => {
-  res.json({ ok: true, service: "BD Trader AI V4" });
+  res.json({ ok: true, service: "BD Trader AI V4 - Gemini Free" });
 });
 
 app.post("/analyze", upload.single("image"), async (req, res) => {
@@ -31,29 +30,20 @@ app.post("/analyze", upload.single("image"), async (req, res) => {
     const market = req.body.market || "Unknown";
     const timeframe = req.body.timeframe || "Unknown";
 
-    const response = await client.responses.create({
-      model: process.env.OPENAI_MODEL || "gpt-4o",
-      input: [{
-        role: "user",
-        content: [
-          { type: "input_text", text: `Analyze chart. Market:${market} Timeframe:${timeframe} Return JSON: signal, confidence, trend, support_resistance, candlestick, momentum, volatility, reasons, no_trade_reason` },
-          { type: "input_image", image_url: `data:${mimeType};base64,${base64}`, detail: "high" }
-        ]
-      }]
-    });
+    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
+    const prompt = `Analyze this ${market} chart, timeframe ${timeframe}. Give BUY/SELL, entry, SL, TP and reason in Bengali.`;
 
-    const text = response.output_text;
-    const result = JSON.parse(text);
-    res.json(result);
+    const result = await model.generateContent([
+      prompt,
+      { inlineData: { data: base64, mimeType: mimeType } }
+    ]);
 
-  } catch (e) {
-    console.error(e);
-    res.status(500).json({ error: e.message });
+    res.json({ result: result.response.text() });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: error.message });
   }
 });
 
-const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  console.log(`Running on ${PORT}`);
-});
-
+const PORT = process.env.PORT || 10000;
+app.listen(PORT, () => console.log(`Running`));
